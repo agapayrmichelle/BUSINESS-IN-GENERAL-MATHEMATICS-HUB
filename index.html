@@ -494,6 +494,86 @@ function checkSentence(inputId, feedbackId){
 }
 </script>
 
+<!-- Make your own Payroll -->
+<div class="card" style="margin-bottom:30px;">
+  <h3>Make Your Own Payroll</h3>
+  <p>
+    Create a payroll file using a spreadsheet application such as Microsoft Excel or Google Sheets. 
+    Your payroll should contain the following columns in this exact order: <strong>EmployeeName, Salary, 
+    WorkingDays, DaysWorked, GrossIncome, Tax, SSS, PhilHealth, TotalDeduction, and NetPay</strong>. 
+    Enter the necessary information for an employee and compute the required values for the payroll. 
+    After completing the payroll, save your file as a <b>.CSV (Comma Separated Values)</b> file. 
+    Upload your completed payroll file below so the system can check whether your computations are correct.
+  </p>
+
+  <p><b>Choose your payroll file:</b></p>
+  <input type="file" id="fileInput" accept=".csv">
+
+  <br><br>
+  <button onclick="checkPayrollFile()">Check Payroll</button>
+
+  <p id="uploadFeedback"></p>
+</div>
+
+<script>
+function checkPayrollFile() {
+  let file = document.getElementById("fileInput").files[0];
+  if(!file){
+    document.getElementById("uploadFeedback").innerHTML = "Please upload a payroll file.";
+    return;
+  }
+
+  let reader = new FileReader();
+
+  reader.onload = function(e){
+    let text = e.target.result;
+    let rows = text.split("\n");
+    let data = rows[1].split(",");
+
+    let salary = parseFloat(data[1]);
+    let workingDays = parseFloat(data[2]);
+    let daysWorked = parseFloat(data[3]);
+    let gross = parseFloat(data[4]);
+    let tax = parseFloat(data[5]);
+    let sss = parseFloat(data[6]);
+    let philhealth = parseFloat(data[7]);
+    let totalDeduction = parseFloat(data[8]);
+    let net = parseFloat(data[9]);
+
+    let correctGross = (salary / workingDays) * daysWorked;
+    let correctDeduction = tax + sss + philhealth;
+    let correctNet = correctGross - correctDeduction;
+
+    let feedback = "";
+
+    if(Math.abs(gross - correctGross) < 0.01){
+      feedback += "✅ Gross Income correct<br>";
+    } else{
+      feedback += "❌ Gross Income incorrect<br>";
+    }
+
+    if(Math.abs(totalDeduction - correctDeduction) < 0.01){
+      feedback += "✅ Total Deduction correct<br>";
+    } else{
+      feedback += "❌ Total Deduction incorrect<br>";
+    }
+
+    if(Math.abs(net - correctNet) < 0.01){
+      feedback += "✅ Net Pay correct<br>";
+    } else{
+      feedback += "❌ Net Pay incorrect<br>";
+    }
+
+    document.getElementById("uploadFeedback").innerHTML = feedback;
+  };
+
+  reader.readAsText(file);
+}
+</script>
+</body>
+</html>
+
+
 
 </body>
 </html>
